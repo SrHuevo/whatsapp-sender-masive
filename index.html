@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Subir Excel y Enviar</title>
+  <!-- Librería para leer Excel -->
+    <link href="/styles.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" async></script>
+    <script src="/main.js" async></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Subir Excel y enviar datos</h1>
+    <p class="subtitle">
+      Sube un archivo Excel (.xlsx / .xls), revisa la tabla y luego envía las filas. El estado se guarda en tu navegador.
+    </p>
+
+    <!-- Área de subida (drag & drop + botón) -->
+    <div id="uploadArea" class="upload-area">
+      <div class="upload-title">Arrastra aquí tu archivo Excel</div>
+      <div class="upload-hint">o</div>
+      <button id="browseButton" class="upload-btn">Seleccionar archivo</button>
+      <div class="upload-hint">Formatos admitidos: .xlsx, .xls</div>
+      <input type="file" id="fileInput" accept=".xlsx,.xls" />
+    </div>
+
+    <!-- Controles -->
+    <div class="controls">
+      <button id="sendButton" class="send-btn" disabled>Enviar</button>
+      <button id="clearSentButton" class="clear-btn">Limpiar enviados</button>
+      <button id="clearAllButton" class="clear-btn">Limpiar todos</button>
+    </div>
+
+    <div id="statusMessage" class="status-message"></div>
+
+    <!-- Tabla -->
+    <div id="tableWrapper" class="table-wrapper" style="display:none;">
+      <table id="dataTable">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="noData" class="no-data">
+      Todavía no se ha cargado ningún archivo.
+    </div>
+
+    <!-- Alerta de error -->
+    <div id="errorAlert" class="alert">
+      <button id="errorAlertClose" class="alert-close">&times;</button>
+      <span id="errorAlertText"></span>
+    </div>
+  </div>
+
+
+</body>
+</html>
