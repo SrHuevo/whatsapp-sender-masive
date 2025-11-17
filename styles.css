@@ -274,11 +274,71 @@
       color: inherit;
     }
 
+    /* Estilos para tablas auxiliares (Comodines y Stages) */
+    #auxiliarTablesSection {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 30px;
+    }
+
+    #auxiliarTablesSection h2 {
+      font-size: 18px;
+      margin: 0 0 15px;
+      color: #333;
+    }
+
+    .auxiliary-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .auxiliary-table thead {
+      background: #f0f0f0;
+    }
+
+    .auxiliary-table th {
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .auxiliary-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e8e8e8;
+      color: #666;
+    }
+
+    .auxiliary-table tbody tr:hover {
+      background-color: #f5f5f5;
+    }
+
+    .auxiliary-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
     @media (max-width: 700px) {
       .container {
         padding: 16px 16px 20px;
       }
       h1 {
         font-size: 18px;
+      }
+
+      #auxiliarTablesSection {
+        padding: 15px;
+      }
+
+      .auxiliary-table th,
+      .auxiliary-table td {
+        padding: 10px;
+        font-size: 14px;
       }
     }

@@ -5,8 +5,19 @@
   <title>Subir Excel y Enviar</title>
   <!-- Librería para leer Excel -->
     <link href="./styles.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" async></script>
-    <script src="./main.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- Scripts modularizados (orden explícito, sin async) -->
+    <script src="./storage.js"></script>
+    <script src="./config.js"></script>
+    <script src="./tableState.js"></script>
+    <script src="./wildcards.js"></script>
+    <script src="./stages.js"></script>
+    <script src="./validation.js"></script>
+    <script src="./fileHandler.js"></script>
+    <script src="./ui.js"></script>
+    <script src="./api.js"></script>
+    <script src="./main.js"></script>
 </head>
 <body>
   <div class="container">
@@ -43,6 +54,39 @@
 
     <div id="noData" class="no-data">
       Todavía no se ha cargado ningún archivo.
+    </div>
+
+    <!-- Tablas de Comodines y Stages -->
+    <div id="auxiliarTablesSection" style="display:none; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+      <h2>Comodines</h2>
+      <div class="controls">
+        <button id="updateWildcardsButton" class="send-btn">Actualizar Comodines</button>
+      </div>
+      <table id="wildcardsTable" class="auxiliary-table">
+        <thead>
+          <tr>
+            <th>Comodín</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Los comodines se llenarán aquí -->
+        </tbody>
+      </table>
+
+      <h2 style="margin-top: 30px;">Stages Disponibles</h2>
+      <div class="controls">
+        <button id="updateStagesButton" class="send-btn">Actualizar Stages</button>
+      </div>
+      <table id="stagesTable" class="auxiliary-table">
+        <thead>
+          <tr>
+            <th>Stage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Los stages se llenarán aquí -->
+        </tbody>
+      </table>
     </div>
 
     <!-- Alerta de error -->
