@@ -239,6 +239,11 @@
       transform: scale(0.98);
     }
 
+    /* Resaltar fila al pasar el ratón (incluye cuando el cursor está sobre el botón) */
+    tbody tr:hover td {
+      background-color: #f0f6ff;
+    }
+
     .no-data {
       font-size: 14px;
       color: #666;
