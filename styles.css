@@ -215,6 +215,30 @@
       color: #721c24;
     }
 
+    /* Estilos para el icono de eliminar por fila */
+    .delete-icon {
+      background: transparent;
+      border: none;
+      color: #c0392b;
+      font-size: 14px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.15s ease, transform 0.06s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .delete-icon:hover {
+      background-color: rgba(192, 57, 43, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .delete-icon:active {
+      transform: scale(0.98);
+    }
+
     .no-data {
       font-size: 14px;
       color: #666;
