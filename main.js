@@ -396,7 +396,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${serverConfig.key}`
+          'x-apikey': `${serverConfig.key}`
         },
         body: JSON.stringify(payload)
       });
