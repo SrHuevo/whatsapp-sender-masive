@@ -22,7 +22,7 @@ async function fetchStages() {
 
     const stages = await response.json();
     safeSetItem(STAGES_STORAGE_KEY, JSON.stringify(stages));
-    populateStagesTable(stages.sort((a,b) => a.name.localeCompare(b.name)));
+    populateStagesTable(stages);
     showStatus('Stages actualizados correctamente.', 'success');
   } catch (error) {
     console.error('Error al obtener stages:', error);
@@ -41,9 +41,11 @@ function populateStagesTable(stages) {
   } else {
     const tagsWrapper = document.createElement('div');
     tagsWrapper.className = 'tags-wrapper';
-    stages.forEach((stage, index) => {
+    const colorCount = 6; // Número de colores disponibles
+    stages.sort((a,b) => a.name.localeCompare(b.name)).forEach((stage, index) => {
       const tag = document.createElement('span');
-      tag.className = 'tag tag-stage';
+      const colorClass = `tag-color-${(index % colorCount) + 1}`;
+      tag.className = `tag tag-stage ${colorClass}`;
       tag.textContent = stage.name || stage;
       tagsWrapper.appendChild(tag);
     });

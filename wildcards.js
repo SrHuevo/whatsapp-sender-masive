@@ -22,7 +22,7 @@ async function fetchWildcards() {
 
     const wildcards = await response.json();
     safeSetItem(WILDCARDS_STORAGE_KEY, JSON.stringify(wildcards));
-    populateWildcardsTable(wildcards.sort((a,b) => a.name.localeCompare(b.name)));
+    populateWildcardsTable(wildcards);
     showStatus('Comodines actualizados correctamente.', 'success');
   } catch (error) {
     console.error('Error al obtener comodines:', error);
@@ -41,9 +41,11 @@ function populateWildcardsTable(wildcards) {
   } else {
     const tagsWrapper = document.createElement('div');
     tagsWrapper.className = 'tags-wrapper';
-    wildcards.forEach((wildcard, index) => {
+    const colorCount = 6; // Número de colores disponibles
+    wildcards.sort((a,b) => a.name.localeCompare(b.name)).forEach((wildcard, index) => {
       const tag = document.createElement('span');
-      tag.className = 'tag tag-wildcard';
+      const colorClass = `tag-color-${(index % colorCount) + 1}`;
+      tag.className = `tag tag-wildcard ${colorClass}`;
       tag.textContent = wildcard.name || wildcard;
       tagsWrapper.appendChild(tag);
     });
