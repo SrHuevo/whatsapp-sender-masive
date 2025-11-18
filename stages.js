@@ -22,7 +22,7 @@ async function fetchStages() {
 
     const stages = await response.json();
     safeSetItem(STAGES_STORAGE_KEY, JSON.stringify(stages));
-    populateStagesTable(stages);
+    populateStagesTable(stages.sort((a,b) => a.name.localeCompare(b.name)));
     showStatus('Stages actualizados correctamente.', 'success');
   } catch (error) {
     console.error('Error al obtener stages:', error);
@@ -31,19 +31,23 @@ async function fetchStages() {
 }
 
 function populateStagesTable(stages) {
-  const stagesTable = document.getElementById('stagesTable');
-  const tbody = stagesTable.querySelector('tbody');
-  tbody.innerHTML = '';
+  const stagesContainer = document.getElementById('stagesContainer');
+  stagesContainer.innerHTML = '';
   if (stages.length === 0) {
-    const row = document.createElement('tr');
-    row.innerHTML = '<td colspan="1" style="text-align:center;color:#999;">No hay stages disponibles</td>';
-    tbody.appendChild(row);
+    const emptyMsg = document.createElement('div');
+    emptyMsg.className = 'empty-message';
+    emptyMsg.textContent = 'No hay stages disponibles';
+    stagesContainer.appendChild(emptyMsg);
   } else {
-    stages.forEach(stage => {
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${stage.name}</td>`;
-      tbody.appendChild(row);
+    const tagsWrapper = document.createElement('div');
+    tagsWrapper.className = 'tags-wrapper';
+    stages.forEach((stage, index) => {
+      const tag = document.createElement('span');
+      tag.className = 'tag tag-stage';
+      tag.textContent = stage.name || stage;
+      tagsWrapper.appendChild(tag);
     });
+    stagesContainer.appendChild(tagsWrapper);
   }
 }
 

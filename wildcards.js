@@ -22,7 +22,7 @@ async function fetchWildcards() {
 
     const wildcards = await response.json();
     safeSetItem(WILDCARDS_STORAGE_KEY, JSON.stringify(wildcards));
-    populateWildcardsTable(wildcards);
+    populateWildcardsTable(wildcards.sort((a,b) => a.name.localeCompare(b.name)));
     showStatus('Comodines actualizados correctamente.', 'success');
   } catch (error) {
     console.error('Error al obtener comodines:', error);
@@ -31,19 +31,23 @@ async function fetchWildcards() {
 }
 
 function populateWildcardsTable(wildcards) {
-  const wildcardsTable = document.getElementById('wildcardsTable');
-  const tbody = wildcardsTable.querySelector('tbody');
-  tbody.innerHTML = '';
+  const wildcardsContainer = document.getElementById('wildcardsContainer');
+  wildcardsContainer.innerHTML = '';
   if (wildcards.length === 0) {
-    const row = document.createElement('tr');
-    row.innerHTML = '<td colspan="1" style="text-align:center;color:#999;">No hay comodines disponibles</td>';
-    tbody.appendChild(row);
+    const emptyMsg = document.createElement('div');
+    emptyMsg.className = 'empty-message';
+    emptyMsg.textContent = 'No hay comodines disponibles';
+    wildcardsContainer.appendChild(emptyMsg);
   } else {
-    wildcards.forEach(wildcard => {
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${wildcard.name}</td>`;
-      tbody.appendChild(row);
+    const tagsWrapper = document.createElement('div');
+    tagsWrapper.className = 'tags-wrapper';
+    wildcards.forEach((wildcard, index) => {
+      const tag = document.createElement('span');
+      tag.className = 'tag tag-wildcard';
+      tag.textContent = wildcard.name || wildcard;
+      tagsWrapper.appendChild(tag);
     });
+    wildcardsContainer.appendChild(tagsWrapper);
   }
 }
 

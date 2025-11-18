@@ -215,6 +215,56 @@
       color: #721c24;
     }
 
+    /* Estilos para tags de comodines y stages */
+    .tags-container {
+      margin: 15px 0 25px 0;
+      min-height: 40px;
+      padding: 10px;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    .tags-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .tag:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .tag-wildcard {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .tag-stage {
+      background: #f3e5f5;
+      color: #7b1fa2;
+    }
+
+    .empty-message {
+      color: #999;
+      font-size: 13px;
+      font-style: italic;
+      padding: 10px;
+      text-align: center;
+    }
+
     /* Estilos para el icono de eliminar por fila */
     .delete-icon {
       background: transparent;
