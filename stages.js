@@ -33,7 +33,7 @@ async function fetchStages() {
 function populateStagesTable(stages) {
   const stagesContainer = document.getElementById('stagesContainer');
   stagesContainer.innerHTML = '';
-  if (stages.length === 0) {
+  if (!stages || stages.length === 0) {
     const emptyMsg = document.createElement('div');
     emptyMsg.className = 'empty-message';
     emptyMsg.textContent = 'No hay stages disponibles';
@@ -41,18 +41,13 @@ function populateStagesTable(stages) {
   } else {
     const tagsWrapper = document.createElement('div');
     tagsWrapper.className = 'tags-wrapper';
-    const colorCount = 6; // Número de colores disponibles
-    stages.sort((a,b) => a.name.localeCompare(b.name)).forEach((stage, index) => {
-      const tag = document.createElement('span');
-      const colorClass = `tag-color-${(index % colorCount) + 1}`;
-      tag.className = `tag tag-stage ${colorClass}`;
-      tag.textContent = stage.name || stage;
+    stages.sort((a,b) => a.localeCompare(b)).forEach((stage, index) => {
+      const tag = makeTag(stage, 'tag-stage', index);
       tagsWrapper.appendChild(tag);
     });
     stagesContainer.appendChild(tagsWrapper);
   }
 }
-
 function loadStagesFromStorage() {
   const stored = safeGetItem(STAGES_STORAGE_KEY);
   if (stored) {

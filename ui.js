@@ -124,6 +124,8 @@ function hideStatus() {
   }
   statusMessage.textContent = '';
   statusMessage.classList.remove('error', 'success');
+  // Ocultar visualmente el contenedor cuando no hay contenido
+  statusMessage.style.display = 'none';
 }
 
 function showStatus(message, type) {
@@ -147,6 +149,9 @@ function showStatus(message, type) {
   statusMessage.classList.remove('error', 'success');
   if (type === 'error') statusMessage.classList.add('error');
   if (type === 'success') statusMessage.classList.add('success');
+
+  // Asegurar que el contenedor sea visible
+  statusMessage.style.display = 'block';
 
   // Auto-hide después de 5 segundos
   if (statusHideTimeout) clearTimeout(statusHideTimeout);

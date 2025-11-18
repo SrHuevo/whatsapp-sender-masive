@@ -135,11 +135,12 @@
       transform: scale(0.97);
     }
 
-    /* Mensaje de estado flotante (siempre visible en la parte inferior) */
+    /* Mensaje de estado flotante (inicialmente oculto; aparece cuando hay mensaje) */
     .status-message {
       font-size: 13px;
       color: #555;
       min-height: 18px;
+      display: none;
       position: fixed;
       bottom: 12px;
       left: 50%;
@@ -281,6 +282,7 @@
       font-weight: 500;
       white-space: nowrap;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
+      cursor: pointer;
     }
 
     .tag:hover {

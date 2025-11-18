@@ -41,12 +41,9 @@ function populateWildcardsTable(wildcards) {
   } else {
     const tagsWrapper = document.createElement('div');
     tagsWrapper.className = 'tags-wrapper';
-    const colorCount = 6; // Número de colores disponibles
     wildcards.sort((a,b) => a.name.localeCompare(b.name)).forEach((wildcard, index) => {
-      const tag = document.createElement('span');
-      const colorClass = `tag-color-${(index % colorCount) + 1}`;
-      tag.className = `tag tag-wildcard ${colorClass}`;
-      tag.textContent = wildcard.name || wildcard;
+      const text = wildcard.name || wildcard;
+      const tag = makeTag(text, 'tag-wildcard', index);
       tagsWrapper.appendChild(tag);
     });
     wildcardsContainer.appendChild(tagsWrapper);
