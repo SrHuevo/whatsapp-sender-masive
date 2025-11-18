@@ -41,7 +41,7 @@ function populateStagesTable(stages) {
   } else {
     const tagsWrapper = document.createElement('div');
     tagsWrapper.className = 'tags-wrapper';
-    stages.sort((a,b) => a.localeCompare(b)).forEach((stage, index) => {
+    stages.sort((a,b) => a.name.localeCompare(b.name)).forEach((stage, index) => {
       const tag = makeTag(stage, 'tag-stage', index);
       tagsWrapper.appendChild(tag);
     });

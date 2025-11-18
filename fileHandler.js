@@ -65,11 +65,54 @@ function handleFile(file) {
       return;
     }
 
-    tableData.headers = headers;
-    tableData.rows = dataRows.map(r => ({
-      values: r,
-      status: 'pending'
-    }));
+    // Al subir otro Excel, añadimos las filas a la lista existente.
+    // Unimos headers: preservamos los headers existentes y añadimos nuevos no presentes.
+    const existingHeaders = Array.isArray(tableData.headers) ? tableData.headers.map(h => (h || '').toString()) : [];
+    const newHeaders = headers.map(h => (h || '').toString().trim());
+
+    let combinedHeaders = [];
+    if (!existingHeaders || existingHeaders.length === 0) {
+      combinedHeaders = newHeaders.slice();
+    } else {
+      // mantener orden de existingHeaders, añadir los nuevos que no existan (case-insensitive)
+      const existingNorm = existingHeaders.map(h => h.toString().trim().toLowerCase());
+      combinedHeaders = existingHeaders.slice();
+      newHeaders.forEach(h => {
+        const hn = h.toString().trim().toLowerCase();
+        if (!existingNorm.includes(hn)) {
+          combinedHeaders.push(h);
+          existingNorm.push(hn);
+        }
+      });
+    }
+
+    // Expandir filas existentes para ajustar al nuevo número de columnas
+    if (!Array.isArray(tableData.rows)) tableData.rows = [];
+    const combinedLen = combinedHeaders.length;
+    tableData.rows = tableData.rows.map(r => {
+      const vals = Array.isArray(r.values) ? r.values.slice() : [];
+      while (vals.length < combinedLen) vals.push('');
+      return { values: vals, status: r.status || 'pending' };
+    });
+
+    // Mapear nuevas filas al orden combinado
+    const headerIndexMap = {};
+    combinedHeaders.forEach((h, idx) => {
+      headerIndexMap[h.toString().trim().toLowerCase()] = idx;
+    });
+
+    const mappedNewRows = dataRows.map(rowArr => {
+      const mapped = new Array(combinedLen).fill('');
+      rowArr.forEach((cell, i) => {
+        const headerName = (newHeaders[i] || '').toString().trim().toLowerCase();
+        const targetIdx = headerIndexMap[headerName];
+        if (targetIdx !== undefined) mapped[targetIdx] = cell;
+      });
+      return { values: mapped, status: 'pending' };
+    });
+
+    tableData.headers = combinedHeaders;
+    tableData.rows = tableData.rows.concat(mappedNewRows);
 
     saveTableData();
     buildTable();
