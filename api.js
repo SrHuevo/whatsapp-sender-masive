@@ -75,21 +75,26 @@ async function sendAllRowsToServer(pendingRows) {
     }
 
     // Construir array de wildcards usados en esta fila (si el header es un wildcard y el valor no está vacío)
-    const wildcardArr = [];
+    const wildcardsArr = [];
     headers.forEach((h, i) => {
       const hn = (h || '').toString().trim().toLowerCase();
       const wObj = wildcardNameToObj[hn];
       const cell = rowVals[i];
       const hasValue = cell !== undefined && cell !== null && String(cell).trim() !== '';
       if (wObj && hasValue) {
-        wildcardArr.push({ id: wObj.id, name: wObj.name, type: wObj.type || '' });
+        wildcardsArr.push({ 
+          id: wObj.id, 
+          name: wObj.name, 
+          type: wObj.type || '',
+          value: String(cell).trim()
+        });
       }
     });
 
     return {
       phone: phone,
       stage: stageId,
-      wildcard: wildcardArr
+      wildcards: wildcardsArr
     };
   });
 
