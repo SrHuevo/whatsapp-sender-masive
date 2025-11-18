@@ -10,10 +10,14 @@ async function sendAllRowsToServer(pendingRows) {
   // Obtener mappings de wildcards y stages (name -> id), normalizados en lowercase
   const storedWildcards = getStoredWildcards() || [];
   const wildcardNameToId = {};
+  const wildcardNameToObj = {}; // También guardamos el objeto completo {id, name, type}
   storedWildcards.forEach(w => {
     if (!w) return;
     const name = (typeof w === 'string' ? w : w.name) || null;
-    if (name) wildcardNameToId[name.toString().trim().toLowerCase()] = w.id || w._id || w.name || name;
+    if (name) {
+      wildcardNameToId[name.toString().trim().toLowerCase()] = w.id || w._id || w.name || name;
+      wildcardNameToObj[name.toString().trim().toLowerCase()] = w;
+    }
   });
 
   const storedStages = getStoredStages() || [];
@@ -32,25 +36,64 @@ async function sendAllRowsToServer(pendingRows) {
     return h || '';
   });
 
-  // Detectar índice de columna stage (header literal 'stage' o header que coincide con un stage name)
+  // Detectar índice de columna stage (header literal 'stage' o header que coincida con un stage name)
   const headersNormalized = headers.map(h => (h || '').toString().trim().toLowerCase());
   const stageColumnIndex = headersNormalized.findIndex(h => h === 'stage' || Object.prototype.hasOwnProperty.call(stageNameToId, h));
 
-  const payload = pendingRows.map(item => {
-    const obj = { id: item.index };
-    (item.row.values || []).forEach((val, i) => {
-      const key = headerKeys[i] || `col_${i}`;
-      // Si esta columna es la de stage, transformar el valor al stage id
-      if (i === stageColumnIndex) {
-        const valNorm = val !== undefined && val !== null ? String(val).trim().toLowerCase() : '';
-        const stageId = stageNameToId[valNorm] || null;
-        obj[key] = stageId !== null ? stageId : val;
-      } else {
-        obj[key] = val;
+  // Recolectar wildcards únicos usados en los headers (id, name, type)
+  const usedWildcardsSet = new Set();
+  headers.forEach(h => {
+    const hn = (h || '').toString().trim().toLowerCase();
+    if (wildcardNameToObj[hn]) {
+      const obj = wildcardNameToObj[hn];
+      usedWildcardsSet.add(JSON.stringify({
+        id: obj.id,
+        name: obj.name,
+        type: obj.type || ''
+      }));
+    }
+  });
+  const wildcardsList = Array.from(usedWildcardsSet).map(s => JSON.parse(s));
+
+  // Construir array de mensajes con la estructura solicitada:
+  // { phone: string, stage: number, wildcard: [{id,name,type}] }
+  const headersNormalizedLower = headers.map(h => (h || '').toString().trim().toLowerCase());
+  const phoneColumnIndex = headersNormalizedLower.findIndex(h => h === 'phone' || h === 'teléfono' || h === 'telefono' || h === 'phone');
+
+  const messages = pendingRows.map(item => {
+    const rowVals = item.row.values || [];
+    // Obtener phone
+    const phoneRaw = phoneColumnIndex !== -1 ? rowVals[phoneColumnIndex] : undefined;
+    const phone = phoneRaw !== undefined && phoneRaw !== null ? String(phoneRaw).trim() : '';
+
+    // Obtener stage id
+    let stageId = null;
+    if (stageColumnIndex !== -1) {
+      const stageRaw = rowVals[stageColumnIndex];
+      const stageNorm = stageRaw !== undefined && stageRaw !== null ? String(stageRaw).trim().toLowerCase() : '';
+      stageId = stageNameToId[stageNorm] || null;
+    }
+
+    // Construir array de wildcards usados en esta fila (si el header es un wildcard y el valor no está vacío)
+    const wildcardArr = [];
+    headers.forEach((h, i) => {
+      const hn = (h || '').toString().trim().toLowerCase();
+      const wObj = wildcardNameToObj[hn];
+      const cell = rowVals[i];
+      const hasValue = cell !== undefined && cell !== null && String(cell).trim() !== '';
+      if (wObj && hasValue) {
+        wildcardArr.push({ id: wObj.id, name: wObj.name, type: wObj.type || '' });
       }
     });
-    return obj;
+
+    return {
+      phone: phone,
+      stage: stageId,
+      wildcard: wildcardArr
+    };
   });
+
+  const payload = messages;
 
   const url = `${serverConfig.url.replace(/\/$/, '')}/messages`;
   const response = await fetch(url, {
