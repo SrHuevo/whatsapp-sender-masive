@@ -92,6 +92,7 @@ async function sendAllRowsToServer(pendingRows) {
     });
 
     return {
+      id: item.index,
       phone: phone,
       stage: stageId,
       wildcards: wildcardsArr
