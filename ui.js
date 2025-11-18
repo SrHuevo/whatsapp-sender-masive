@@ -112,12 +112,47 @@ function updateRowStatusUI(rowIndex, status) {
   updateRowStatus(rowIndex, status);
 }
 
+let statusHideTimeout = null;
+let errorHideTimeout = null;
+
+function hideStatus() {
+  const statusMessage = document.getElementById('statusMessage');
+  if (!statusMessage) return;
+  if (statusHideTimeout) {
+    clearTimeout(statusHideTimeout);
+    statusHideTimeout = null;
+  }
+  statusMessage.textContent = '';
+  statusMessage.classList.remove('error', 'success');
+}
+
 function showStatus(message, type) {
   const statusMessage = document.getElementById('statusMessage');
-  statusMessage.textContent = message || '';
+  if (!statusMessage) return;
+
+  // Contenido: texto + botón cerrar
+  statusMessage.innerHTML = '';
+  const span = document.createElement('span');
+  span.className = 'status-text';
+  span.textContent = message || '';
+  statusMessage.appendChild(span);
+
+  const close = document.createElement('button');
+  close.className = 'status-close';
+  close.title = 'Cerrar';
+  close.textContent = '×';
+  close.addEventListener('click', hideStatus);
+  statusMessage.appendChild(close);
+
   statusMessage.classList.remove('error', 'success');
   if (type === 'error') statusMessage.classList.add('error');
   if (type === 'success') statusMessage.classList.add('success');
+
+  // Auto-hide después de 5 segundos
+  if (statusHideTimeout) clearTimeout(statusHideTimeout);
+  statusHideTimeout = setTimeout(() => {
+    hideStatus();
+  }, 5000);
 }
 
 function showErrorAlert(message) {
@@ -125,11 +160,20 @@ function showErrorAlert(message) {
   const errorAlertText = document.getElementById('errorAlertText');
   errorAlertText.textContent = message;
   errorAlert.style.display = 'block';
+
+  if (errorHideTimeout) clearTimeout(errorHideTimeout);
+  errorHideTimeout = setTimeout(() => {
+    hideErrorAlert();
+  }, 5000);
 }
 
 function hideErrorAlert() {
   const errorAlert = document.getElementById('errorAlert');
   const errorAlertText = document.getElementById('errorAlertText');
+  if (errorHideTimeout) {
+    clearTimeout(errorHideTimeout);
+    errorHideTimeout = null;
+  }
   errorAlert.style.display = 'none';
   errorAlertText.textContent = '';
 }
@@ -140,6 +184,11 @@ function setupUIListeners() {
   const clearSentButton = document.getElementById('clearSentButton');
 
   errorAlertClose.addEventListener('click', hideErrorAlert);
+
+  // permitir que el usuario cierre el status (click en la X también lo cierra)
+  const statusMessage = document.getElementById('statusMessage');
+  // clicking on the text area should close status too
+  statusMessage.addEventListener('click', hideStatus);
 
   clearAllButton.addEventListener('click', () => {
     const ok = confirm('¿Seguro que quieres borrar todos los datos? Esta acción no se puede deshacer.');

@@ -135,11 +135,21 @@
       transform: scale(0.97);
     }
 
+    /* Mensaje de estado flotante (siempre visible en la parte inferior) */
     .status-message {
       font-size: 13px;
       color: #555;
       min-height: 18px;
-      margin-bottom: 8px;
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1200;
+      padding: 8px 14px;
+      background: rgba(255,255,255,0.96);
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      pointer-events: auto; /* permite interactuar (cerrar) */
     }
 
     .status-message.error {
@@ -148,6 +158,37 @@
 
     .status-message.success {
       color: #1e7c34;
+    }
+
+    /* Botón de cerrar pequeño dentro del estado */
+    .status-close {
+      background: transparent;
+      border: none;
+      font-size: 14px;
+      line-height: 1;
+      margin-left: 10px;
+      color: inherit;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+    }
+
+    .status-text {
+      vertical-align: middle;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .status-message.error {
+      color: #c0392b;
+      background: #fff6f6;
+      border: 1px solid rgba(192, 57, 43, 0.12);
+    }
+
+    .status-message.success {
+      color: #1e7c34;
+      background: #f6fffa;
+      border: 1px solid rgba(30, 124, 52, 0.12);
     }
 
     .table-wrapper {
@@ -341,15 +382,21 @@
       margin-top: 10px;
     }
 
+    /* Alerta de error flotante (sobre el status) */
     .alert {
       display: none;
       margin-top: 16px;
-      padding: 10px 12px;
-      border-radius: 8px;
+      padding: 12px 14px;
+      border-radius: 10px;
       background: #fdecea;
       color: #611a15;
       font-size: 13px;
-      position: relative;
+      position: fixed;
+      bottom: 60px; /* sitúa encima del mensaje de estado */
+      left: 12px;
+      right: 12px;
+      z-index: 1201;
+      pointer-events: auto; /* sintetiza interacción con el botón cerrar */
     }
 
     .alert-close {
@@ -362,6 +409,11 @@
       line-height: 1;
       cursor: pointer;
       color: inherit;
+    }
+
+    /* Dejar espacio inferior para el feedback flotante */
+    body {
+      padding-bottom: 120px;
     }
 
     /* Estilos para tablas auxiliares (Comodines y Stages) */
