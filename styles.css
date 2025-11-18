@@ -307,36 +307,8 @@
       color: #7b1fa2;
     }
 
-    /* Stages - 6 variantes de púrpura y rosa */
-    .tag-stage.tag-color-1 {
-      background: #f3e5f5;
-      color: #7b1fa2;
-    }
-
-    .tag-stage.tag-color-2 {
-      background: #e1bee7;
-      color: #6a1b9a;
-    }
-
-    .tag-stage.tag-color-3 {
-      background: #ce93d8;
-      color: #4a148c;
-    }
-
-    .tag-stage.tag-color-4 {
-      background: #ba68c8;
-      color: #ffffff;
-    }
-
-    .tag-stage.tag-color-5 {
-      background: #ab47bc;
-      color: #ffffff;
-    }
-
-    .tag-stage.tag-color-6 {
-      background: #9c27b0;
-      color: #ffffff;
-    }
+    /* Stages: utilizan la paleta pastel genérica (.tag-color-X) para más variedad,
+       mantenemos .tag-stage como fallback. */
 
     .empty-message {
       color: #999;
