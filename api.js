@@ -7,12 +7,50 @@ async function sendAllRowsToServer(pendingRows) {
     throw new Error('Configuración del servidor incompleta.');
   }
 
-  const payload = pendingRows.map(item => ({
-    id: item.index,
-    ...Object.fromEntries(
-      item.row.values.map((val, i) => [tableData.headers[i] || `col_${i}`, val])
-    )
-  }));
+  // Obtener mappings de wildcards y stages (name -> id), normalizados en lowercase
+  const storedWildcards = getStoredWildcards() || [];
+  const wildcardNameToId = {};
+  storedWildcards.forEach(w => {
+    if (!w) return;
+    const name = (typeof w === 'string' ? w : w.name) || null;
+    if (name) wildcardNameToId[name.toString().trim().toLowerCase()] = w.id || w._id || w.name || name;
+  });
+
+  const storedStages = getStoredStages() || [];
+  const stageNameToId = {};
+  storedStages.forEach(s => {
+    if (!s) return;
+    const name = (typeof s === 'string' ? s : s.name) || null;
+    if (name) stageNameToId[name.toString().trim().toLowerCase()] = s.id || s._id || s.name || name;
+  });
+
+  // Normalizar headers y preparar las claves de payload: si header es un wildcard, usar su id como key
+  const headers = Array.isArray(tableData.headers) ? tableData.headers.map(h => (h || '').toString()) : [];
+  const headerKeys = headers.map(h => {
+    const hn = (h || '').toString().trim().toLowerCase();
+    if (wildcardNameToId[hn]) return wildcardNameToId[hn];
+    return h || '';
+  });
+
+  // Detectar índice de columna stage (header literal 'stage' o header que coincide con un stage name)
+  const headersNormalized = headers.map(h => (h || '').toString().trim().toLowerCase());
+  const stageColumnIndex = headersNormalized.findIndex(h => h === 'stage' || Object.prototype.hasOwnProperty.call(stageNameToId, h));
+
+  const payload = pendingRows.map(item => {
+    const obj = { id: item.index };
+    (item.row.values || []).forEach((val, i) => {
+      const key = headerKeys[i] || `col_${i}`;
+      // Si esta columna es la de stage, transformar el valor al stage id
+      if (i === stageColumnIndex) {
+        const valNorm = val !== undefined && val !== null ? String(val).trim().toLowerCase() : '';
+        const stageId = stageNameToId[valNorm] || null;
+        obj[key] = stageId !== null ? stageId : val;
+      } else {
+        obj[key] = val;
+      }
+    });
+    return obj;
+  });
 
   const url = `${serverConfig.url.replace(/\/$/, '')}/messages`;
   const response = await fetch(url, {

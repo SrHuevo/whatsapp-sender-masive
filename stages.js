@@ -42,7 +42,7 @@ function populateStagesTable(stages) {
     const tagsWrapper = document.createElement('div');
     tagsWrapper.className = 'tags-wrapper';
     stages.sort((a,b) => a.name.localeCompare(b.name)).forEach((stage, index) => {
-      const tag = makeTag(stage, 'tag-stage', index);
+      const tag = makeTag(stage.name, 'tag-stage', index);
       tagsWrapper.appendChild(tag);
     });
     stagesContainer.appendChild(tagsWrapper);
