@@ -253,35 +253,13 @@
     }
 
     /* Comodines - 6 variantes de azul */
-    .tag-wildcard.tag-color-1 {
-      background: #e3f2fd;
-      color: #1565c0;
-    }
+    .tag-color-1 { background: #ffd6e0; color: #a64d79; }
+    .tag-color-2 { background: #ffe5b4; color: #b8860b; }
+    .tag-color-3 { background: #c1f7d3; color: #388e3c; }
+    .tag-color-4 { background: #b3e5fc; color: #1976d2; }
+    .tag-color-5 { background: #e0c1f7; color: #6a1b9a; }
+    .tag-color-6 { background: #fff9b4; color: #bdb76b; }
 
-    .tag-wildcard.tag-color-2 {
-      background: #bbdefb;
-      color: #0d47a1;
-    }
-
-    .tag-wildcard.tag-color-3 {
-      background: #90caf9;
-      color: #1a237e;
-    }
-
-    .tag-wildcard.tag-color-4 {
-      background: #64b5f6;
-      color: #0d47a1;
-    }
-
-    .tag-wildcard.tag-color-5 {
-      background: #42a5f5;
-      color: #1565c0;
-    }
-
-    .tag-wildcard.tag-color-6 {
-      background: #2196f3;
-      color: #ffffff;
-    }
 
     .tag-stage {
       background: #f3e5f5;
