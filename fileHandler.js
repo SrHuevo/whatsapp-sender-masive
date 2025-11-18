@@ -46,7 +46,17 @@ function handleFile(file) {
 
     // Validar valores de la columna stage
     try {
-      const stageColumnIndex = headers.findIndex(h => h === 'stage' || h === 'Stage' || h === 'STAGE');
+      // Normalizar headers
+      const headersNormalized = headers.map(h => (h || '').toString().trim().toLowerCase());
+
+      // Construir set de nombres de stages almacenados (aceptar strings u objetos {name})
+      const storedStages = getStoredStages() || [];
+      const stageNamesSet = new Set(storedStages.map(s => {
+        if (!s && s !== '') return null;
+        return typeof s === 'string' ? s.trim().toLowerCase() : (s && s.name ? String(s.name).trim().toLowerCase() : null);
+      }).filter(Boolean));
+
+      const stageColumnIndex = headersNormalized.findIndex(h => h === 'stage' || stageNamesSet.has(h));
       if (stageColumnIndex !== -1) {
         validateStageValues(stageColumnIndex, dataRows);
       }
