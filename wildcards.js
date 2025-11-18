@@ -11,7 +11,7 @@ async function fetchWildcards() {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${serverConfig.key}`,
+        'x-apikey': `${serverConfig.key}`,
         'Content-Type': 'application/json'
       }
     });
@@ -20,8 +20,7 @@ async function fetchWildcards() {
       throw new Error(`Error al obtener comodines: ${response.statusText}`);
     }
 
-    const data = await response.json();
-    const wildcards = Array.isArray(data) ? data : data.wildcards || [];
+    const wildcards = await response.json();
     safeSetItem(WILDCARDS_STORAGE_KEY, JSON.stringify(wildcards));
     populateWildcardsTable(wildcards);
     showStatus('Comodines actualizados correctamente.', 'success');
@@ -42,7 +41,7 @@ function populateWildcardsTable(wildcards) {
   } else {
     wildcards.forEach(wildcard => {
       const row = document.createElement('tr');
-      row.innerHTML = `<td>${wildcard}</td>`;
+      row.innerHTML = `<td>${wildcard.name}</td>`;
       tbody.appendChild(row);
     });
   }

@@ -11,7 +11,7 @@ async function fetchStages() {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${serverConfig.key}`,
+        'x-apikey': `${serverConfig.key}`,
         'Content-Type': 'application/json'
       }
     });
@@ -20,8 +20,7 @@ async function fetchStages() {
       throw new Error(`Error al obtener stages: ${response.statusText}`);
     }
 
-    const data = await response.json();
-    const stages = Array.isArray(data) ? data : data.stages || [];
+    const stages = await response.json();
     safeSetItem(STAGES_STORAGE_KEY, JSON.stringify(stages));
     populateStagesTable(stages);
     showStatus('Stages actualizados correctamente.', 'success');
@@ -42,7 +41,7 @@ function populateStagesTable(stages) {
   } else {
     stages.forEach(stage => {
       const row = document.createElement('tr');
-      row.innerHTML = `<td>${stage}</td>`;
+      row.innerHTML = `<td>${stage.name}</td>`;
       tbody.appendChild(row);
     });
   }
