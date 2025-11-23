@@ -166,10 +166,12 @@ function showErrorAlert(message) {
   errorAlertText.textContent = message;
   errorAlert.style.display = 'block';
 
-  if (errorHideTimeout) clearTimeout(errorHideTimeout);
-  errorHideTimeout = setTimeout(() => {
-    hideErrorAlert();
-  }, 5000);
+  // No auto-ocultar: el usuario debe cerrar manualmente
+  // Limpiar timeout previo si existe
+  if (errorHideTimeout) {
+    clearTimeout(errorHideTimeout);
+    errorHideTimeout = null;
+  }
 }
 
 function hideErrorAlert() {
