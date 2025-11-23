@@ -2,11 +2,12 @@
 // api.js - Comunicación con el servidor
 // ========================================
 
-async function sendAllRowsToServer(pendingRows) {
-  if (!serverConfig.url || !serverConfig.key) {
-    throw new Error('Configuración del servidor incompleta.');
-  }
+const BATCH_SIZE = 50;
 
+// Variable para controlar si hay un envío en progreso
+let sendingInProgress = false;
+
+function buildMessagesFromRows(pendingRows) {
   // Obtener mappings de wildcards y stages (name -> id), normalizados en lowercase
   const storedWildcards = getStoredWildcards() || [];
   const wildcardNameToId = {};
@@ -60,7 +61,7 @@ async function sendAllRowsToServer(pendingRows) {
   const headersNormalizedLower = headers.map(h => (h || '').toString().trim().toLowerCase());
   const phoneColumnIndex = headersNormalizedLower.findIndex(h => h === 'phone' || h === 'teléfono' || h === 'telefono' || h === 'phone');
 
-  const messages = pendingRows.map(item => {
+  return pendingRows.map(item => {
     const rowVals = item.row.values || [];
     // Obtener phone
     const phoneRaw = phoneColumnIndex !== -1 ? rowVals[phoneColumnIndex] : undefined;
@@ -98,8 +99,12 @@ async function sendAllRowsToServer(pendingRows) {
       wildcards: wildcardsArr
     };
   });
+}
 
-  const payload = messages;
+async function sendBatchToServer(batchMessages) {
+  if (!serverConfig.url || !serverConfig.key) {
+    throw new Error('Configuración del servidor incompleta.');
+  }
 
   const url = `${serverConfig.url.replace(/\/$/, '')}/messages`;
   const response = await fetch(url, {
@@ -108,7 +113,7 @@ async function sendAllRowsToServer(pendingRows) {
       'Content-Type': 'application/json',
       'x-apikey': `${serverConfig.key}`
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(batchMessages)
   });
 
   if (!response.ok) {
@@ -117,6 +122,64 @@ async function sendAllRowsToServer(pendingRows) {
   }
 
   return await response.json();
+}
+
+async function sendAllRowsToServer(pendingRows, onProgress) {
+  if (!serverConfig.url || !serverConfig.key) {
+    throw new Error('Configuración del servidor incompleta.');
+  }
+
+  // Construir todos los mensajes primero
+  const messages = buildMessagesFromRows(pendingRows);
+
+  // Dividir en lotes
+  const batches = [];
+  for (let i = 0; i < messages.length; i += BATCH_SIZE) {
+    batches.push(messages.slice(i, i + BATCH_SIZE));
+  }
+
+  const totalBatches = batches.length;
+  let successCount = 0;
+  let errorCount = 0;
+  const allSuccessful = [];
+  const allFailed = [];
+
+  // Enviar cada lote
+  for (let i = 0; i < batches.length; i++) {
+    const batch = batches[i];
+    
+    // Actualizar progreso
+    if (onProgress) {
+      onProgress(i + 1, totalBatches, successCount + errorCount, messages.length);
+    }
+
+    try {
+      const result = await sendBatchToServer(batch);
+      
+      if (result.successful) {
+        allSuccessful.push(...result.successful);
+        successCount += result.successful.length;
+      }
+      if (result.failed) {
+        allFailed.push(...result.failed);
+        errorCount += result.failed.length;
+      }
+    } catch (error) {
+      // Si falla un lote, marcar todos los mensajes del lote como error
+      batch.forEach(msg => allFailed.push(msg.id));
+      errorCount += batch.length;
+    }
+  }
+
+  // Progreso final
+  if (onProgress) {
+    onProgress(totalBatches, totalBatches, messages.length, messages.length);
+  }
+
+  return {
+    successful: allSuccessful,
+    failed: allFailed
+  };
 }
 
 function setupSendListener() {
@@ -134,10 +197,14 @@ function setupSendListener() {
 
     hideErrorAlert();
     sendButton.disabled = true;
-    showStatus('Enviando datos…', '');
+    showProgressBar(true);
+    showStatus('Preparando envío…', '');
+    sendingInProgress = true;
 
     try {
-      const result = await sendAllRowsToServer(pendingRows);
+      const result = await sendAllRowsToServer(pendingRows, (currentBatch, totalBatches, processedMessages, totalMessages) => {
+        updateProgressBar(currentBatch, totalBatches, processedMessages, totalMessages);
+      });
       
       let successCount = 0;
       let errorCount = 0;
@@ -174,6 +241,18 @@ function setupSendListener() {
       showErrorAlert(error.message || 'Error desconocido');
     } finally {
       sendButton.disabled = false;
+      showProgressBar(false);
+      sendingInProgress = false;
     }
   });
 }
+
+// Prevenir cierre de pestaña durante el envío
+window.addEventListener('beforeunload', (event) => {
+  if (sendingInProgress) {
+    const message = '¡Hay un envío en progreso! Si cierras esta pestaña, el proceso se detendrá y algunos mensajes pueden no enviarse.';
+    event.preventDefault();
+    event.returnValue = message; // Para navegadores antiguos
+    return message;
+  }
+});

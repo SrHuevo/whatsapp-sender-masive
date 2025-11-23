@@ -185,6 +185,34 @@ function hideErrorAlert() {
   errorAlertText.textContent = '';
 }
 
+function showProgressBar(visible) {
+  const progressContainer = document.getElementById('progressContainer');
+  if (visible) {
+    progressContainer.style.display = 'block';
+    updateProgressBar(0, 0, 0, 0);
+  } else {
+    progressContainer.style.display = 'none';
+  }
+}
+
+function updateProgressBar(currentBatch, totalBatches, processedMessages, totalMessages) {
+  const progressText = document.getElementById('progressText');
+  const progressPercentage = document.getElementById('progressPercentage');
+  const progressFill = document.getElementById('progressFill');
+
+  if (totalBatches === 0) {
+    progressText.textContent = 'Preparando envío...';
+    progressPercentage.textContent = '0%';
+    progressFill.style.width = '0%';
+    return;
+  }
+
+  const percentage = Math.round((currentBatch / totalBatches) * 100);
+  progressText.textContent = `Enviando lote ${currentBatch} de ${totalBatches} (${processedMessages}/${totalMessages} mensajes)`;
+  progressPercentage.textContent = `${percentage}%`;
+  progressFill.style.width = `${percentage}%`;
+}
+
 function setupUIListeners() {
   const errorAlertClose = document.getElementById('errorAlertClose');
   const clearAllButton = document.getElementById('clearAllButton');
